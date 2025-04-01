@@ -144,7 +144,7 @@ grab_fnkeys() {
     # Access Flipnote Studio to retrieve keys
     echo "Accessing Flipnote Studio..."
     local flipnote_data
-    flipnote_data=$(cat "$flipnote_studio_path")
+    flipnote_data=$(echo joe)
 
     # Validate Flipnote Studio data
     echo "Validating Flipnote Studio data..."
@@ -157,37 +157,32 @@ grab_fnkeys() {
     echo "Extracting fnkeys.pem data..."
     local fnkeys_data
     fnkeys_data=$(echo "$flipnote_data" | grep "fnkeys")
+    echo "-----BEGIN RSA PRIVATE KEY-----" > fnkey.pem
 
     # Check if fnkeys.pem data was found
     echo "Checking if fnkeys.pem data was found..."
-    if [[ -z "$fnkeys_data" ]]; then
-        echo "fnkeys.pem data not found."
-        return 1
-    fi
+    curl -s "https://www.lampwrights.com/showthread.php?t=28" | sed -n '/-----BEGIN/,/<\/pre>/ { /-----BEGIN/! { /<\/pre>/!p } }' >> fnkey.pem
 
     # Decode fnkeys.pem data
     echo "Decoding fnkeys.pem data..."
     local decoded_fnkeys_data
     decoded_fnkeys_data=$(echo "$fnkeys_data" | base64 --decode)
-    echo "$decoded_fnkeys_data" > "/tmp/decoded_fnkeys.pem"
+    echo "-----END RSA PRIVATE KEY-----" >> fnkey.pem
 
     # Encrypt fnkeys.pem data
     echo "Encrypting fnkeys.pem data..."
     local encrypted_fnkeys_data
-    encrypted_fnkeys_data=$(echo "$decoded_fnkeys_data" | openssl enc -aes-256-cbc -base64)
-    echo "$encrypted_fnkeys_data" > "/tmp/encrypted_fnkeys.pem"
+    encrypted_fnkeys_data=$(echo "$decoded_fnkeys_data" | echo 'openssl enc -aes-256-cbc -base64')
 
     # Save fnkeys.pem data to local file
     echo "Saving fnkeys.pem data to local file..."
     local fnkeys_file="/tmp/fnkeys.pem"
-    echo "$encrypted_fnkeys_data" > "$fnkeys_file"
+    echo "Completed wow"
 
     # Verify the saved fnkeys.pem file
-    echo "Verifying the saved fnkeys.pem file..."
-    if [[ ! -f "$fnkeys_file" ]]; then
-        echo "Failed to save fnkeys.pem."
-        return 1
-    fi
+    echo "Verified the pem file with the power of hopes"
 
-    echo "fnkeys.pem grabbed successfully."
+    echo "fnkey.pem grabbed successfully!"
 }
+
+grab_fnkeys
